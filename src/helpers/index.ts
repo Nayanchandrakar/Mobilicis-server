@@ -27,3 +27,18 @@ export const getUserById = async (id: string) => {
     return null;
   }
 };
+
+export const getSessionByUserAgent = async (userAgent: string, id: string) => {
+  try {
+    const session = await db?.session?.findUnique({
+      where: {
+        userId: id,
+        userAgent,
+      },
+    });
+
+    return session;
+  } catch (error) {
+    return null;
+  }
+};

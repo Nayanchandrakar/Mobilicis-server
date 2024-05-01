@@ -21,16 +21,26 @@ id  String  @id @default(auto()) @map("_id") @db.ObjectId
   password      String
   emailVerified DateTime?
   // isTwoFactorEnabled Boolean @default(false)
+  session       Session[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
 
+model Session {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  token String @unique
+  userAgent  String @unique
+  status Boolean @default(false)
+  timeStamp  DateTime @default(now())
+  user User?  @relation(fields: [userId] , references: [id], onDelete:Cascade)
+  userId String?  @db.ObjectId
+}
 
 
 model emailVerification {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   token String @unique
   expire DateTime
-  email String
+  email String 
   @@unique([token,email])
 }
