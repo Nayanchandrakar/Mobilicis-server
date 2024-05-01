@@ -1,10 +1,16 @@
 import express from "express";
-import type { Request, Response } from "express";
+import {
+  registerController,
+  verifyTokenController,
+  loginController,
+} from "../controllers/auth-controller";
+import { loginSchema, registerSchema } from "../schemas/auth-schema";
+import { validateData } from "../middleware/zod-validation";
 
 const router = express.Router();
 
-router.get("/", (req: Request, res: Response) => {
-  return res.status(200).json("hello world ");
-});
+router.post("/register", validateData(registerSchema), registerController);
+router.get("/verify-token/:token", verifyTokenController);
+router.post("/login", validateData(loginSchema), loginController);
 
 export default router;
