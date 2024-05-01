@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 
 // imports
-import { getSessionByUserAgent, getUserByEmail } from "../helpers";
+import { getSessionByUserAgent, getUserByEmail, getUserById } from "../helpers";
 import db from "../lib/db";
 import { loginSchemaType, registerSchemaType } from "../schemas/auth-schema";
 import {
@@ -11,6 +11,7 @@ import {
 } from "../helpers/token-verification";
 import { cookieConifg } from "../config/cookie-config";
 import { maintainSession } from "../helpers/session";
+import { AuthenticatedRequest } from "../types/types";
 
 const registerController = async (req: Request, res: Response) => {
   try {
@@ -164,4 +165,20 @@ const loginController = async (req: Request, res: Response) => {
   }
 };
 
-export { registerController, verifyTokenController, loginController };
+const userController = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    // const user = await getUserById(id)
+    return res.status(200).json({ data: req.user });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export {
+  registerController,
+  verifyTokenController,
+  loginController,
+  userController,
+};
