@@ -12,6 +12,7 @@ import {
 import { cookieConifg } from "../config/cookie-config";
 import { maintainSession } from "../helpers/session";
 import { AuthenticatedRequest } from "../types/types";
+import { createAuditLog } from "../helpers/audit";
 
 const registerController = async (req: Request, res: Response) => {
   try {
@@ -21,7 +22,7 @@ const registerController = async (req: Request, res: Response) => {
 
     if (user) {
       return res.status(401).json({
-        message: "Email already in use",
+        error: "Email already in use",
       });
     }
 
@@ -38,12 +39,12 @@ const registerController = async (req: Request, res: Response) => {
     const verificationToken = await generateEmailVerificationToken(email);
 
     return res.status(200).json({
-      message: "Confirm your Email",
+      success: "Confirm your Email",
       data: verificationToken,
     });
   } catch (error) {
     return res.status(500).json({
-      message: "Internal server error",
+      error: "Internal server error",
     });
   }
 };
@@ -54,27 +55,41 @@ const verifyTokenController = async (req: Request, res: Response) => {
 
     if (!token) {
       return res.status(402).json({
-        message: "token is not provided",
+        error: "token is not provided",
       });
     }
 
-    const user = await getTokenByToken(token);
+    const tokenData = await getTokenByToken(token);
 
-    if (!user) {
+    if (!tokenData) {
       return res.status(404).json({
-        message: "token not exist",
+        error: "token not exist",
       });
     }
 
     const userAgent = req?.headers["user-agent"];
 
-    const hasExpired = !!(new Date(user?.expire) < new Date());
+    const hasExpired = !!(new Date(tokenData?.expire) < new Date());
 
     if (hasExpired) {
       return res.status(401).json({
-        message: "Token is Expired",
+        error: "Token is Expired",
       });
     }
+
+    const user = await getUserByEmail(tokenData?.email);
+
+    if (!user) {
+      return res.status(405).json({
+        error: "user not found",
+      });
+    }
+
+    await createAuditLog({
+      type: !user?.emailVerified ? "REGISTER" : "LOGIN",
+      userAgent,
+      userId: user?.id,
+    });
 
     await db?.user?.update({
       where: {
@@ -101,14 +116,15 @@ const verifyTokenController = async (req: Request, res: Response) => {
       },
     });
 
-    res.cookie("token", jwtToken, cookieConifg);
-
     return res.status(200).json({
-      message: "Succefully login",
+      success: "Succefully login",
+      data: {
+        jwtToken,
+      },
     });
   } catch (error) {
     return res.status(500).json({
-      message: "Internal server error",
+      error: "Internal server error",
     });
   }
 };
@@ -123,7 +139,7 @@ const loginController = async (req: Request, res: Response) => {
 
     if (!user) {
       return res.status(402).json({
-        message: "Email not in use!",
+        error: "Email not found",
       });
     }
 
@@ -131,9 +147,15 @@ const loginController = async (req: Request, res: Response) => {
 
     if (!validPassword) {
       return res.status(401).json({
-        message: "Password is wrong",
+        error: "Password is wrong",
       });
     }
+
+    await createAuditLog({
+      type: "LOGIN",
+      userAgent,
+      userId: user?.id,
+    });
 
     // additional logic to be added for 2FA
     //here
@@ -152,26 +174,42 @@ const loginController = async (req: Request, res: Response) => {
       },
     });
 
-    res.cookie("token", jwtToken, cookieConifg);
-
-    return res.status(200).json({
-      message: "Succefully logged IN",
-      data: user,
+    res.status(200).json({
+      data: {
+        ...user,
+        jwtToken,
+      },
+      success: "suceefully login",
     });
   } catch (error) {
     return res.status(500).json({
-      message: "Internal server error",
+      error: "Internal server error",
     });
   }
 };
 
 const userController = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    // const user = await getUserById(id)
-    return res.status(200).json({ data: req.user });
+    const userId = req.user;
+
+    const user = await getUserById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        error: "Invalid token provided",
+      });
+    }
+
+    return res.status(200).json({
+      data: {
+        password: null,
+        ...user,
+      },
+      success: "user data succefully fetched",
+    });
   } catch (error) {
     return res.status(500).json({
-      message: "Internal server error",
+      error: "Internal server error",
     });
   }
 };
