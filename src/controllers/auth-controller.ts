@@ -9,7 +9,7 @@ import {
   generateEmailVerificationToken,
   getTokenByToken,
 } from "../helpers/token-verification";
-import { cookieConifg } from "../config/cookie-config";
+
 import { maintainSession } from "../helpers/session";
 import { AuthenticatedRequest } from "../types/types";
 import { createAuditLog } from "../helpers/audit";
