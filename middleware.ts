@@ -20,6 +20,7 @@ export async function middleware(request: NextRequest) {
 
   const user = await getUser(token);
   const isVerified = user?.emailVerified;
+  console.log(user);
 
   if (!isVerified) {
     return Response.redirect(new URL("/auth/login", nextUrl));
@@ -28,8 +29,6 @@ export async function middleware(request: NextRequest) {
   if (isAuthRoutes && isVerified) {
     return Response.redirect(new URL(DEFAULT_REDIRECT_URL, nextUrl));
   }
-
-  return null;
 }
 
 export const config = {

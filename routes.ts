@@ -19,3 +19,4 @@ export const authRoutes = ["/auth/login", "/auth/register"];
  */
 
 export const DEFAULT_REDIRECT_URL = "/user";
+export const UNAUTHORIZED_REDIRECT = "/auth/login";
