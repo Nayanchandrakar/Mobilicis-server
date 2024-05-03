@@ -4,15 +4,22 @@ import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import SessionCard from "./_components/session-card";
 import { formatAgent } from "@/lib/user-agent-formatter";
+import { headers } from "next/headers";
+import { userAgent } from "next/server";
 
 interface AnalyticsPageProps {}
 
 const AnalyticsPage = async ({}: AnalyticsPageProps) => {
   const session = await getUserSession();
 
+  const headersList = headers();
+  const userAgentStructure = { headers: headersList };
+  const { ua } = userAgent(userAgentStructure);
+
   const formattedData = session?.data?.map((elem) => ({
     ...elem,
     userAgent: formatAgent(elem?.userAgent),
+    rawAgent: elem?.userAgent,
   }));
 
   return (
@@ -33,7 +40,7 @@ const AnalyticsPage = async ({}: AnalyticsPageProps) => {
         </div>
         <section className="grid grid-cols-3 gap-4">
           {formattedData?.map((data) => (
-            <SessionCard key={data?.id} {...data} />
+            <SessionCard key={data?.id} {...data} ua={ua} />
           ))}
         </section>
       </>

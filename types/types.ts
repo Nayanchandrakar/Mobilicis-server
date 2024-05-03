@@ -1,4 +1,4 @@
-import { UserRoleType } from "@/types/user-role";
+import { ActivitType, UserRoleType } from "@/types/user-role";
 
 export interface userInterface {
   id: string;
@@ -19,4 +19,13 @@ export interface sessionInterface {
   status: boolean;
   timeStamp: Date;
   userId: string;
+}
+
+export interface activityInterface {
+  id: string;
+  type: ActivitType;
+  userAgent: string;
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
 }

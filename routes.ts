@@ -3,7 +3,7 @@
  * non authenticated user
  * @type {string[]}
  */
-export const publicRoutes = ["/"];
+export const publicRoutes = ["/", "/auth/verify-token"];
 
 /**
  * authRoutes that are accessible for authentication

@@ -19,10 +19,13 @@ export async function middleware(request: NextRequest) {
   }
 
   const user = await getUser(token);
-  const isVerified = user?.emailVerified;
+  const isVerified = !!user?.emailVerified;
 
   if (!isVerified) {
-    return Response.redirect(new URL("/auth/login", nextUrl));
+    if (!isAuthRoutes && !isPublicRoute) {
+      return Response.redirect(new URL("/auth/login", nextUrl));
+    }
+    return null;
   }
 
   if (isAuthRoutes && isVerified) {

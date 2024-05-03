@@ -23,6 +23,7 @@ interface LoginFormProps {}
 
 const LoginForm: FC<LoginFormProps> = ({}) => {
   const [isPending, setIsPending] = useState(false);
+  const [isTwoFactor, setIsTwoFactor] = useState(false);
 
   const form = useForm<loginSchemaType>({
     resolver: zodResolver(loginSchema),
@@ -56,44 +57,67 @@ const LoginForm: FC<LoginFormProps> = ({}) => {
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    disabled={isPending}
-                    type="email"
-                    placeholder="john.doe@example.com"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input
-                    disabled={isPending}
-                    type="password"
-                    placeholder="*****"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {isTwoFactor ? (
+            <FormField
+              control={form.control}
+              name="code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Two Factor Code</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={isPending}
+                      type="code"
+                      placeholder="12345"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ) : (
+            <>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isPending}
+                        type="email"
+                        placeholder="john.doe@example.com"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isPending}
+                        type="password"
+                        placeholder="*****"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </>
+          )}
           <Button disabled={isPending} className="w-full" type="submit">
-            Login
+            {isTwoFactor ? "Confirm" : "Login"}
           </Button>
         </form>
       </Form>

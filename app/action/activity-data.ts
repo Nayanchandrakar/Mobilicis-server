@@ -1,8 +1,8 @@
-import { sessionInterface } from "./../../types/types";
+import { activityInterface } from "@/types/types";
 import { serverUrl } from "@/lib/env-export";
 import { getToken } from "@/app/action/cookei";
 
-export const getUserSession = async () => {
+export const getUserActivity = async () => {
   try {
     const token = await getToken();
 
@@ -12,7 +12,7 @@ export const getUserSession = async () => {
       };
     }
 
-    const res = await fetch(`${serverUrl("/analytics/get")}`, {
+    const res = await fetch(`${serverUrl("/activity/get")}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -30,7 +30,7 @@ export const getUserSession = async () => {
     const {
       data,
     }: {
-      data: sessionInterface[] | [];
+      data: activityInterface[] | [];
     } = resData;
 
     return {

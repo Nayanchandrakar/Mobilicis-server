@@ -1,15 +1,11 @@
 "use server";
-
 import { serverUrl } from "@/lib/env-export";
 import { cookies, headers } from "next/headers";
-import { loginSchema, loginSchemaType } from "@/schema/zod-schema";
 import { userAgent } from "next/server";
 
-export const loginAction = async (formData: loginSchemaType) => {
+export const verifyTokenAction = async (token: string) => {
   try {
-    const validateFields = loginSchema?.safeParse(formData);
-
-    if (!validateFields?.success) {
+    if (!token) {
       return {
         error: "Invalid credentials",
       };
@@ -19,13 +15,10 @@ export const loginAction = async (formData: loginSchemaType) => {
     const userAgentStructure = { headers: headersList };
     const { ua } = userAgent(userAgentStructure);
 
-    const res = await fetch(serverUrl("/auth/login"), {
-      method: "POST",
+    const res = await fetch(serverUrl(`/auth/verify-token/${token}`), {
       headers: {
-        "Content-Type": "application/json",
         "User-Agent": ua,
       },
-      body: JSON.stringify(formData),
     });
 
     const resData = await res.json();
@@ -46,7 +39,7 @@ export const loginAction = async (formData: loginSchemaType) => {
       success,
     };
   } catch (error) {
-    console.log(`[ERROR_FROM_LOGIN_ACTION]`, error);
+    console.log(`[ERROR_FROM_VERIFY_ACTION]`, error);
     return {
       error: "Internal server error",
     };
