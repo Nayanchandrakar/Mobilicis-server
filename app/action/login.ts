@@ -36,10 +36,17 @@ export const loginAction = async (formData: loginSchemaType) => {
       };
     }
 
-    const { data, success } = resData;
+    const { data, success, twoFactor } = resData;
 
     if (data?.jwtToken) {
       cookies()?.set("token", data?.jwtToken);
+    }
+
+    if (twoFactor) {
+      return {
+        twoFactor,
+        success,
+      };
     }
 
     return {
