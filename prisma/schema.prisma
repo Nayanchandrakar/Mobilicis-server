@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -20,44 +19,62 @@ enum AuditType {
 }
 
 model User {
-  id  String  @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
-  email         String   @unique
-  password      String
-  emailVerified DateTime?
-  role          UserRole @default(USER)
-  // isTwoFactorEnabled Boolean @default(false)
-  session       Session[]
-  auditLogs     AuditLog[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                    String                 @id @default(auto()) @map("_id") @db.ObjectId
+  name                  String
+  email                 String                 @unique
+  password              String
+  emailVerified         DateTime?
+  role                  UserRole               @default(USER)
+  isTwoFactorEnabled    Boolean                @default(false)
+  twoFactorConfirmation TwoFactorConfirmation?
+  session               Session[]
+  auditLogs             AuditLog[]
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
 }
 
 model Session {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  token String @unique
-  userAgent  String @unique
-  status Boolean @default(false)
-  timeStamp  DateTime @default(now())
-  user User?  @relation(fields: [userId] , references: [id], onDelete:Cascade)
-  userId String?  @db.ObjectId
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  token     String   @unique
+  userAgent String   @unique
+  status    Boolean  @default(false)
+  timeStamp DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String?  @db.ObjectId
 }
 
-
 model emailVerification {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  token String @unique
+  id     String   @id @default(auto()) @map("_id") @db.ObjectId
+  token  String   @unique
   expire DateTime
-  email String 
-  @@unique([token,email])
+  email  String
+
+  @@unique([token, email])
+}
+
+model TwoFactorToken {
+  id     String   @id @default(auto()) @map("_id") @db.ObjectId
+  token  String   @unique
+  expire DateTime
+  email  String
+
+  @@unique([token, email])
+}
+
+model TwoFactorConfirmation {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.ObjectId
+
+  @@unique([userId])
 }
 
 model AuditLog {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  type AuditType
-  userAgent String 
-  user User?  @relation(fields: [userId] , references: [id], onDelete:Cascade)
-  userId String?  @db.ObjectId
-  createdAt DateTime @default(now())
-  udpatedAt DateTime @updatedAt
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  type      AuditType
+  userAgent String
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String?   @db.ObjectId
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }

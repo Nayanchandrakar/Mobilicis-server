@@ -1,5 +1,31 @@
 import { v4 as uuidv4 } from "uuid";
 import db from "../lib/db";
+import { getTwoFactorTokenByEmail } from "../helpers/two-factor";
+import crypto from "crypto";
+
+export const generateTwoFactorToken = async (email: string) => {
+  const token = crypto.randomInt(100_000, 1_00_00).toString();
+  const expire = new Date(new Date().getTime() + 3600 * 1000);
+
+  const existingToken = await getTwoFactorTokenByEmail(email);
+  if (existingToken) {
+    await db?.twoFactorConfirmation?.delete({
+      where: {
+        id: existingToken?.id,
+      },
+    });
+  }
+
+  const twoFactorToken = await db?.twoFactorToken?.create({
+    data: {
+      email,
+      token,
+      expire,
+    },
+  });
+
+  return twoFactorToken;
+};
 
 export const getTokenByEmail = async (email: string) => {
   try {

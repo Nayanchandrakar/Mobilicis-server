@@ -8,6 +8,7 @@ import morgan from "morgan";
 // routes import
 import authRoute from "./Routes/auth";
 import analyticsRoute from "./Routes/analytics";
+import activityRoute from "./Routes/activity";
 
 dotenv.config();
 const app = express();
@@ -27,7 +28,10 @@ app.use(morgan("dev"));
 // route for authentication like register login and logout
 app.use("/auth", authRoute);
 
+// route for viewing user analytics need authentication
 app.use("/analytics", analyticsRoute);
+
+app.use("/activity", activityRoute);
 
 app.listen(PORT, () => {
   console.log(`server is running on http://localhost:${PORT}`);

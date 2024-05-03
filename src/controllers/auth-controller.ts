@@ -5,14 +5,12 @@ import bcrypt from "bcryptjs";
 import { getSessionByUserAgent, getUserByEmail, getUserById } from "../helpers";
 import db from "../lib/db";
 import { loginSchemaType, registerSchemaType } from "../schemas/auth-schema";
-import {
-  generateEmailVerificationToken,
-  getTokenByToken,
-} from "../helpers/token-verification";
+import { getTokenByToken } from "../helpers/token-verification";
 
 import { maintainSession } from "../helpers/session";
 import { AuthenticatedRequest } from "../types/types";
 import { createAuditLog } from "../helpers/audit";
+import { sendVerificationEmail } from "../helpers/mail";
 
 const registerController = async (req: Request, res: Response) => {
   try {
@@ -36,11 +34,11 @@ const registerController = async (req: Request, res: Response) => {
       },
     });
 
-    const verificationToken = await generateEmailVerificationToken(email);
+    await sendVerificationEmail(email);
 
     return res.status(200).json({
       success: "Confirm your Email",
-      data: verificationToken,
+      data: null,
     });
   } catch (error) {
     return res.status(500).json({
@@ -85,12 +83,6 @@ const verifyTokenController = async (req: Request, res: Response) => {
       });
     }
 
-    await createAuditLog({
-      type: !user?.emailVerified ? "REGISTER" : "LOGIN",
-      userAgent,
-      userId: user?.id,
-    });
-
     await db?.user?.update({
       where: {
         email: user?.email,
@@ -107,6 +99,12 @@ const verifyTokenController = async (req: Request, res: Response) => {
 
     const { jwtToken } = await maintainSession(session, user?.id, userAgent);
 
+    await createAuditLog({
+      type: !user?.emailVerified ? "REGISTER" : "LOGIN",
+      userAgent,
+      userId: user?.id,
+    });
+
     await db?.emailVerification?.delete({
       where: {
         token_email: {
@@ -117,7 +115,9 @@ const verifyTokenController = async (req: Request, res: Response) => {
     });
 
     return res.status(200).json({
-      success: "Succefully login",
+      success: !user?.emailVerified
+        ? "Succefully registered"
+        : "Succefully Login",
       data: {
         jwtToken,
       },
@@ -148,6 +148,13 @@ const loginController = async (req: Request, res: Response) => {
     if (!validPassword) {
       return res.status(401).json({
         error: "Password is wrong",
+      });
+    }
+
+    if (!user?.emailVerified) {
+      await sendVerificationEmail(user?.email!);
+      return res.status(406).json({
+        error: "an verification email is sent!",
       });
     }
 
