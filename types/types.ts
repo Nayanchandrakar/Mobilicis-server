@@ -11,3 +11,12 @@ export interface userInterface {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface sessionInterface {
+  id: string;
+  token: string;
+  userAgent: string;
+  status: boolean;
+  timeStamp: Date;
+  userId: string;
+}

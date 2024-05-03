@@ -1,8 +1,9 @@
 "use server";
 
 import { serverUrl } from "@/lib/env-export";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { loginSchema, loginSchemaType } from "@/schema/zod-schema";
+import { userAgent } from "next/server";
 
 export const loginAction = async (formData: loginSchemaType) => {
   try {
@@ -14,10 +15,15 @@ export const loginAction = async (formData: loginSchemaType) => {
       };
     }
 
+    const headersList = headers();
+    const userAgentStructure = { headers: headersList };
+    const { ua } = userAgent(userAgentStructure);
+
     const res = await fetch(serverUrl("/auth/login"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "User-Agent": ua,
       },
       body: JSON.stringify(formData),
     });

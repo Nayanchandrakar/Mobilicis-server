@@ -7,6 +7,7 @@ export const getUser = async (token: string): Promise<userInterface | null> => {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      cache: "force-cache",
     });
 
     if (!res.ok) {

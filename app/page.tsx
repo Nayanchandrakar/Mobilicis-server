@@ -1,5 +1,6 @@
 import Container from "@/components/shared/global-container";
 import { Button } from "@/components/ui/button";
+import { DEFAULT_REDIRECT_URL } from "@/routes";
 import Link from "next/link";
 
 interface HomepageProps {}
@@ -18,7 +19,7 @@ const Homepage = ({}: HomepageProps) => {
           </p>
 
           <Button size="lg" className="px-12 py-6" asChild>
-            <Link href="/user">Explore</Link>
+            <Link href={DEFAULT_REDIRECT_URL}>Explore</Link>
           </Button>
         </div>
       </Container>

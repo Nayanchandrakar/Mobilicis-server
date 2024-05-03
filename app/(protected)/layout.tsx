@@ -35,7 +35,7 @@ export default async function UserLayout({
         <Sidebar />
       </div>
       <Navbar user={user} />
-      <main className="md:pl-72 pl-0">{children}</main>
+      <main className="md:pl-72 pl-0 mt-[78px]">{children}</main>
     </div>
   );
 }

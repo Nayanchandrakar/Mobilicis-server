@@ -17,6 +17,7 @@ import { loginSchema, loginSchemaType } from "@/schema/zod-schema";
 import { Button } from "@/components/ui/button";
 import { loginAction } from "@/app/action/login";
 import { ToastEmitter } from "@/lib/toast-emitter";
+import { DEFAULT_REDIRECT_URL } from "@/routes";
 
 interface LoginFormProps {}
 
@@ -37,7 +38,7 @@ const LoginForm: FC<LoginFormProps> = ({}) => {
       const res = await loginAction(values);
       ToastEmitter(res);
       if (res?.success) {
-        window.location.href = "/user";
+        window.location.href = DEFAULT_REDIRECT_URL;
       }
     } catch (error) {
       console.log(error, "[ERROR_FROM_LOGIN_FORM]");

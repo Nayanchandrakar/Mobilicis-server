@@ -20,7 +20,6 @@ export async function middleware(request: NextRequest) {
 
   const user = await getUser(token);
   const isVerified = user?.emailVerified;
-  console.log(user);
 
   if (!isVerified) {
     return Response.redirect(new URL("/auth/login", nextUrl));
