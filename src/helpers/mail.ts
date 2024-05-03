@@ -16,3 +16,14 @@ export const sendVerificationEmail = async (email: string) => {
     return null;
   }
 };
+
+export const sendTwoFactorEmail = async (email: string, token: string) => {
+  try {
+    const htmlTemplate = `<p>Your 2FA code: ${token} </p> `;
+
+    sendMail(email, htmlTemplate);
+    return true;
+  } catch (error) {
+    return null;
+  }
+};

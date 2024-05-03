@@ -4,12 +4,12 @@ import { getTwoFactorTokenByEmail } from "../helpers/two-factor";
 import crypto from "crypto";
 
 export const generateTwoFactorToken = async (email: string) => {
-  const token = crypto.randomInt(100_000, 1_00_00).toString();
+  const token = crypto.randomInt(100_000, 1_000_000).toString();
   const expire = new Date(new Date().getTime() + 3600 * 1000);
 
   const existingToken = await getTwoFactorTokenByEmail(email);
   if (existingToken) {
-    await db?.twoFactorConfirmation?.delete({
+    await db?.twoFactorToken?.delete({
       where: {
         id: existingToken?.id,
       },

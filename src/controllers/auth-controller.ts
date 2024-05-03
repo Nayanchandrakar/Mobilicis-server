@@ -5,12 +5,16 @@ import bcrypt from "bcryptjs";
 import { getSessionByUserAgent, getUserByEmail, getUserById } from "../helpers";
 import db from "../lib/db";
 import { loginSchemaType, registerSchemaType } from "../schemas/auth-schema";
-import { getTokenByToken } from "../helpers/token-verification";
+import {
+  generateTwoFactorToken,
+  getTokenByToken,
+} from "../helpers/token-verification";
 
 import { maintainSession } from "../helpers/session";
 import { AuthenticatedRequest } from "../types/types";
 import { createAuditLog } from "../helpers/audit";
-import { sendVerificationEmail } from "../helpers/mail";
+import { sendTwoFactorEmail, sendVerificationEmail } from "../helpers/mail";
+import { getTwoFactorTokenByEmail } from "../helpers/two-factor";
 
 const registerController = async (req: Request, res: Response) => {
   try {
@@ -131,7 +135,7 @@ const verifyTokenController = async (req: Request, res: Response) => {
 
 const loginController = async (req: Request, res: Response) => {
   try {
-    const { email, password }: loginSchemaType = req?.body;
+    const { email, password, code }: loginSchemaType = req?.body;
 
     const userAgent = req?.headers["user-agent"];
 
@@ -158,14 +162,52 @@ const loginController = async (req: Request, res: Response) => {
       });
     }
 
+    // @FA code here
+
+    if (user?.isTwoFactorEnabled && user?.email) {
+      if (code) {
+        const twoFactorToken = await getTwoFactorTokenByEmail(email);
+
+        if (!twoFactorToken) {
+          return res.status(406).json({
+            error: "Code is wrong",
+          });
+        }
+
+        if (twoFactorToken?.token !== code) {
+          return res.status(409).json({
+            error: "Invalid code!",
+          });
+        }
+
+        const hasExpired = !!(new Date(twoFactorToken?.expire) < new Date());
+
+        if (hasExpired) {
+          return res.status(407).json({
+            error: "Code is expired",
+          });
+        }
+
+        await db?.twoFactorToken?.delete({
+          where: {
+            id: twoFactorToken?.id,
+          },
+        });
+      } else {
+        const twoFactorToken = await generateTwoFactorToken(user?.email);
+        sendTwoFactorEmail(twoFactorToken?.email, twoFactorToken?.token);
+        return res.status(200).json({
+          twoFactor: true,
+          success: "An code is sent to your email",
+        });
+      }
+    }
+
     await createAuditLog({
       type: "LOGIN",
       userAgent,
       userId: user?.id,
     });
-
-    // additional logic to be added for 2FA
-    //here
 
     // for normal user authentication
 

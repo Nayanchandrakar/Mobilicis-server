@@ -17,6 +17,7 @@ export const loginSchema = z.object({
   password: z.string().min(3, {
     message: "minimum 3 characters required",
   }),
+  code: z.optional(z.string()),
 });
 
 export type loginSchemaType = z.infer<typeof loginSchema>;
