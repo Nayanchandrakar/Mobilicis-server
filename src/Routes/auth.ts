@@ -14,7 +14,6 @@ const router = express.Router();
 router.post("/register", validateData(registerSchema), registerController);
 router.get("/verify-token/:token", verifyTokenController);
 router.post("/login", validateData(loginSchema), loginController);
-// @ts-ignore
 router.get("/user", authenticateToken, userController);
 
 export default router;

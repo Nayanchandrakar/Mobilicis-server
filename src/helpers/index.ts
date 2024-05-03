@@ -42,3 +42,17 @@ export const getSessionByUserAgent = async (userAgent: string, id: string) => {
     return null;
   }
 };
+
+export const getSessionByUserId = async (id: string) => {
+  try {
+    const session = await db?.session?.findMany({
+      where: {
+        userId: id,
+      },
+    });
+
+    return session;
+  } catch (error) {
+    return null;
+  }
+};
