@@ -4,6 +4,7 @@ import { serverUrl } from "@/lib/env-export";
 import { cookies, headers } from "next/headers";
 import { loginSchema, loginSchemaType } from "@/schema/zod-schema";
 import { userAgent } from "next/server";
+import { cookieConfig } from "@/lib/utils";
 
 export const loginAction = async (formData: loginSchemaType) => {
   try {
@@ -36,10 +37,10 @@ export const loginAction = async (formData: loginSchemaType) => {
       };
     }
 
-    const { data, success, twoFactor } = resData;
+    const { data, success, twoFactor, redirect } = resData;
 
     if (data?.jwtToken) {
-      cookies()?.set("token", data?.jwtToken);
+      cookies()?.set("token", data?.jwtToken, cookieConfig);
     }
 
     if (twoFactor) {
@@ -50,6 +51,7 @@ export const loginAction = async (formData: loginSchemaType) => {
     }
 
     return {
+      redirect,
       success,
     };
   } catch (error) {

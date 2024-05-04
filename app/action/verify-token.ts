@@ -1,5 +1,6 @@
 "use server";
 import { serverUrl } from "@/lib/env-export";
+import { cookieConfig } from "@/lib/utils";
 import { cookies, headers } from "next/headers";
 import { userAgent } from "next/server";
 
@@ -32,7 +33,7 @@ export const verifyTokenAction = async (token: string) => {
     const { data, success } = resData;
 
     if (data?.jwtToken) {
-      cookies()?.set("token", data?.jwtToken);
+      cookies()?.set("token", data?.jwtToken, cookieConfig);
     }
 
     return {

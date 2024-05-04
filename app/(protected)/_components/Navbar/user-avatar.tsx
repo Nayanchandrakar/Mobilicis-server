@@ -31,6 +31,8 @@ const UserAvatar: FC<UserAvatarProps> = ({ user }) => {
       <DropdownMenuContent>
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem>{user?.name}</DropdownMenuItem>
+        <DropdownMenuItem>{user?.email}</DropdownMenuItem>
         <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
           Log out
         </DropdownMenuItem>

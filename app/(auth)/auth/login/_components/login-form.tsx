@@ -40,8 +40,10 @@ const LoginForm: FC<LoginFormProps> = ({}) => {
       ToastEmitter(res);
 
       if (res?.twoFactor) {
-        setIsTwoFactor(res?.twoFactor);
-      } else {
+        setIsTwoFactor(true);
+      }
+
+      if (res?.redirect) {
         window.location.href = DEFAULT_REDIRECT_URL;
       }
     } catch (error) {
