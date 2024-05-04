@@ -1,14 +1,13 @@
 import type { Session } from "@prisma/client";
 import db from "../lib/db";
-import { generateJsonToken } from "../lib/jwt";
+import { getUserById } from "../helpers";
 
 export const maintainSession = async (
   session: Session,
   userId: string,
-  userAgent: string
+  userAgent: string,
+  jwtToken: string
 ) => {
-  const jwtToken = generateJsonToken(userId);
-
   try {
     if (session) {
       await db?.session?.update({
@@ -33,8 +32,28 @@ export const maintainSession = async (
       });
     }
 
-    return { jwtToken };
+    return true;
   } catch (error) {
     return null;
+  }
+};
+
+export const deleteUserSession = async (userId: string) => {
+  try {
+    const user = await getUserById(userId);
+
+    if (!user) {
+      return false;
+    }
+
+    const deleteSession = await db?.session?.deleteMany({
+      where: {
+        userId,
+      },
+    });
+
+    return true;
+  } catch (error) {
+    return false;
   }
 };

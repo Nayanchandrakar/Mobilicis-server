@@ -15,6 +15,7 @@ import { AuthenticatedRequest } from "../types/types";
 import { createAuditLog } from "../helpers/audit";
 import { sendTwoFactorEmail, sendVerificationEmail } from "../helpers/mail";
 import { getTwoFactorTokenByEmail } from "../helpers/two-factor";
+import { generateJsonToken } from "../lib/jwt";
 
 const registerController = async (req: Request, res: Response) => {
   try {
@@ -100,8 +101,8 @@ const verifyTokenController = async (req: Request, res: Response) => {
     });
 
     const session = await getSessionByUserAgent(userAgent, user?.id);
-
-    const { jwtToken } = await maintainSession(session, user?.id, userAgent);
+    const jwtToken = generateJsonToken(user?.id);
+    await maintainSession(session, user?.id, userAgent, jwtToken);
 
     await createAuditLog({
       type: !user?.emailVerified ? "REGISTER" : "LOGIN",
@@ -212,7 +213,8 @@ const loginController = async (req: Request, res: Response) => {
     // for normal user authentication
 
     const session = await getSessionByUserAgent(userAgent, user?.id);
-    const { jwtToken } = await maintainSession(session, user?.id, userAgent);
+    const jwtToken = generateJsonToken(user?.id);
+    await maintainSession(session, user?.id, userAgent, jwtToken);
 
     await db?.user?.update({
       where: {
@@ -228,9 +230,11 @@ const loginController = async (req: Request, res: Response) => {
         ...user,
         jwtToken,
       },
+      redirect: true,
       success: "suceefully login",
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       error: "Internal server error",
     });
