@@ -26,8 +26,8 @@ const Logo: FC<LogoProps> = ({}) => {
           onClick={() => mobileMenu.onOpen()}
         />
       ) : null}
-      <Link href="/" className={cn("text-2xl", font?.className)}>
-        Um
+      <Link href="/" className={cn("text-2xl font-medium", font?.className)}>
+        User
       </Link>
     </div>
   );

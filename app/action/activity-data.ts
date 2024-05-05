@@ -17,6 +17,10 @@ export const getUserActivity = async () => {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      cache: "force-cache",
+      next: {
+        tags: ["refetchActivity"],
+      },
     });
 
     const resData = await res.json();

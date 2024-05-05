@@ -27,7 +27,7 @@ const AnalyticsPage = async ({}: AnalyticsPageProps) => {
       <>
         <div className="md:py-10 flex items-center justify-center flex-col">
           <ShieldCheck className="size-24 text-sky-600" />
-          <h2 className="font-semibold text-xl sm:text-3xl">
+          <h2 className="font-semibold text-xl sm:text-3xl text-center">
             Manage Access and Devices
           </h2>
           <p className="text-center font-medium text-sm mt-2 sm:mt-4 line-clamp-3">

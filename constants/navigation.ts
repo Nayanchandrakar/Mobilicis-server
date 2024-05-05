@@ -1,4 +1,4 @@
-import { Activity, BarChart2, Layout, LucideIcon } from "lucide-react";
+import { Activity, BarChart2, LucideIcon } from "lucide-react";
 
 export interface NavigationInterface {
   label: string;
@@ -9,9 +9,4 @@ export interface NavigationInterface {
 export const userPanel: NavigationInterface[] = [
   { label: "Analytics", href: "/analytics", Icon: BarChart2 },
   { label: "Activities", href: "/activities", Icon: Activity },
-];
-
-export const adminPanel: NavigationInterface[] = [
-  { label: "Dashboard", href: "/user", Icon: Layout },
-  { label: "Activities", href: "/activity", Icon: Activity },
 ];

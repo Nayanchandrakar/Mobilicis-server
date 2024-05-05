@@ -1,10 +1,9 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 
-import { MoreHorizontal, Pencil, ArrowUpDown } from "lucide-react";
+import { MoreHorizontal, ArrowUpDown, Trash } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,8 +13,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import Link from "next/link";
 import { ActivitType } from "@/types/user-role";
+import { deleteActivityAction } from "@/app/action/delete-activity";
+import { useTransition } from "react";
 
 export type activityType = {
   id: string;
@@ -90,6 +90,17 @@ export const columns: ColumnDef<activityType>[] = [
     id: "actions",
     cell: ({ row }) => {
       const { id } = row?.original;
+      const [isPending, startTransition] = useTransition();
+
+      const handleDelete = () => {
+        if (!id) {
+          return;
+        }
+        startTransition(async () => {
+          await deleteActivityAction(id);
+        });
+      };
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -99,11 +110,13 @@ export const columns: ColumnDef<activityType>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem asChild>
-              <Link href={`/teacher/courses/${id}`}>
-                <Pencil className="w-4 h-4 mr-2" />
-                Edit
-              </Link>
+            <DropdownMenuItem
+              onClick={handleDelete}
+              disabled={isPending}
+              className="text-red-500 cursor-pointer"
+            >
+              <Trash className="w-4 h-4 mr-2" />
+              delete
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
