@@ -21,3 +21,9 @@ export const loginSchema = z.object({
 });
 
 export type loginSchemaType = z.infer<typeof loginSchema>;
+
+export const twoFactorSchema = z.object({
+  twoFactor: z.boolean(),
+});
+
+export type twoFactorType = z.infer<typeof twoFactorSchema>;

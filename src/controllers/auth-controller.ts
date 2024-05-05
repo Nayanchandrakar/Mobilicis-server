@@ -4,7 +4,11 @@ import bcrypt from "bcryptjs";
 // imports
 import { getSessionByUserAgent, getUserByEmail, getUserById } from "../helpers";
 import db from "../lib/db";
-import { loginSchemaType, registerSchemaType } from "../schemas/auth-schema";
+import {
+  loginSchemaType,
+  registerSchemaType,
+  twoFactorType,
+} from "../schemas/auth-schema";
 import {
   generateTwoFactorToken,
   getTokenByToken,
@@ -267,9 +271,49 @@ const userController = async (req: AuthenticatedRequest, res: Response) => {
   }
 };
 
+const twoFactorController = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  try {
+    const userId = req.user;
+
+    const user = await getUserById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        error: "Invalid token provided",
+      });
+    }
+    const { twoFactor }: twoFactorType = req?.body;
+
+    await db?.user?.update({
+      where: {
+        id: user?.id,
+      },
+      data: {
+        isTwoFactorEnabled: !!twoFactor,
+      },
+      select: {
+        isTwoFactorEnabled: true,
+      },
+    });
+
+    return res.status(200).json({
+      success: `two factor auth ${twoFactor ? "Enabled" : "Disabled"}`,
+      data: twoFactor,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+};
+
 export {
   registerController,
   verifyTokenController,
   loginController,
   userController,
+  twoFactorController,
 };

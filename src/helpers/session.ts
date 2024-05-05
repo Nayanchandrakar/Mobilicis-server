@@ -57,3 +57,36 @@ export const deleteUserSession = async (userId: string) => {
     return false;
   }
 };
+
+export const getSessionById = async (id: string) => {
+  try {
+    const session = await db?.session?.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    return session;
+  } catch (error) {
+    return null;
+  }
+};
+
+export const deleteSingleSession = async (id: string) => {
+  try {
+    const isExist = await getSessionById(id);
+    if (!isExist) {
+      return null;
+    }
+
+    const deletedData = await db?.session?.delete({
+      where: {
+        id: isExist?.id,
+      },
+    });
+
+    return deletedData;
+  } catch (error) {
+    return null;
+  }
+};

@@ -33,13 +33,14 @@ model User {
 }
 
 model Session {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  token     String   @unique
-  userAgent String   @unique
-  status    Boolean  @default(false)
-  timeStamp DateTime @default(now())
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String?  @db.ObjectId
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  token        String   @unique
+  userAgent    String   @unique
+  isRestricted Boolean  @default(false)
+  status       Boolean  @default(false)
+  timeStamp    DateTime @default(now())
+  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String?  @db.ObjectId
 }
 
 model emailVerification {

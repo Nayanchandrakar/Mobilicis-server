@@ -12,7 +12,9 @@ import authRoute from "./Routes/auth";
 import analyticsRoute from "./Routes/analytics";
 import activityRoute from "./Routes/activity";
 import { User } from "@prisma/client";
-import { deleteUserSession } from "../src/helpers/session";
+import { deleteSingleSession, deleteUserSession } from "./helpers/session";
+import sessionRoute from "./Routes/session-route";
+import db from "./lib/db";
 
 dotenv.config();
 const app = express();
@@ -48,12 +50,22 @@ app.use("/analytics", analyticsRoute);
 
 app.use("/activity", activityRoute);
 
+app.use("/session", sessionRoute);
+
+// socket io
 io.on("connect", (socket) => {
   console.log(socket?.id, "a user connnected");
 
   socket.on("logoutAll", async (user: User) => {
     const isDeleted = await deleteUserSession(user?.id);
     io?.emit(user?.id, !!isDeleted);
+  });
+
+  socket?.on("sessionLogout", async (sessionId: string) => {
+    const sessionData = await deleteSingleSession(sessionId);
+    if (sessionData?.id) {
+      io?.emit(sessionData?.id, !!sessionData);
+    }
   });
 
   socket.on("disconnect", () => {
