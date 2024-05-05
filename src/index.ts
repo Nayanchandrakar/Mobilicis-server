@@ -12,8 +12,13 @@ import authRoute from "./Routes/auth";
 import analyticsRoute from "./Routes/analytics";
 import activityRoute from "./Routes/activity";
 import { User } from "@prisma/client";
-import { deleteSingleSession, deleteUserSession } from "./helpers/session";
+import {
+  deleteSingleSession,
+  deleteUserSession,
+  getSessionById,
+} from "./helpers/session";
 import sessionRoute from "./Routes/session-route";
+import { createAuditLog } from "./helpers/audit";
 import db from "./lib/db";
 
 dotenv.config();
@@ -58,15 +63,43 @@ io.on("connect", (socket) => {
 
   socket.on("logoutAll", async (user: User) => {
     const isDeleted = await deleteUserSession(user?.id);
-    io?.emit(user?.id, !!isDeleted);
+    if (isDeleted) {
+      io?.emit(user?.id, !!isDeleted);
+    }
   });
 
   socket?.on("sessionLogout", async (sessionId: string) => {
     const sessionData = await deleteSingleSession(sessionId);
     if (sessionData?.id) {
+      await createAuditLog({
+        type: "LOGIN",
+        userAgent: sessionData?.userAgent,
+        userId: sessionData?.userId,
+      });
+
       io?.emit(sessionData?.id, !!sessionData);
     }
   });
+
+  socket?.on(
+    "restrictDevice",
+    async ({ id, isRestricted }: { id: string; isRestricted: boolean }) => {
+      const session = await getSessionById(id);
+
+      if (session && session?.id) {
+        await db?.session?.update({
+          where: {
+            id: session?.id,
+          },
+          data: {
+            isRestricted,
+          },
+        });
+
+        io?.emit(`${session?.id}34545`, !!session);
+      }
+    }
+  );
 
   socket.on("disconnect", () => {
     console.log("user disconnected");

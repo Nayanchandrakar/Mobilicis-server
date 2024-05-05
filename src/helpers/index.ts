@@ -49,6 +49,9 @@ export const getSessionByUserId = async (id: string) => {
       where: {
         userId: id,
       },
+      orderBy: {
+        timeStamp: "desc",
+      },
     });
 
     return session;

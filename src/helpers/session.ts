@@ -46,7 +46,7 @@ export const deleteUserSession = async (userId: string) => {
       return false;
     }
 
-    const deleteSession = await db?.session?.deleteMany({
+    await db?.session?.deleteMany({
       where: {
         userId,
       },

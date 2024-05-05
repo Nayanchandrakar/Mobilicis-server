@@ -1,7 +1,6 @@
 import type { Request, Response } from "express";
 import { AuthenticatedRequest } from "../types/types";
-import { getUserById } from "../helpers";
-import db from "../lib/db";
+import { getSessionByUserAgent, getUserById } from "../helpers";
 
 const getSingleSession = async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -15,7 +14,7 @@ const getSingleSession = async (req: AuthenticatedRequest, res: Response) => {
       });
     }
 
-    const { userAgent } = req?.params;
+    const userAgent = req?.headers["user-agent"];
 
     if (!userAgent) {
       return res.status(402).json({
@@ -23,12 +22,7 @@ const getSingleSession = async (req: AuthenticatedRequest, res: Response) => {
       });
     }
 
-    const session = await db?.session?.findUnique({
-      where: {
-        userAgent,
-        userId: user?.id,
-      },
-    });
+    const session = await getSessionByUserAgent(userAgent, user?.id);
 
     if (!session) {
       return res.status(405).json({

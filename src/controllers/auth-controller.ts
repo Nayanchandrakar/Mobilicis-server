@@ -217,6 +217,13 @@ const loginController = async (req: Request, res: Response) => {
     // for normal user authentication
 
     const session = await getSessionByUserAgent(userAgent, user?.id);
+
+    if (session && session?.isRestricted) {
+      return res.status(403).json({
+        error: "You are restricted!",
+      });
+    }
+
     const jwtToken = generateJsonToken(user?.id);
     await maintainSession(session, user?.id, userAgent, jwtToken);
 
@@ -293,9 +300,6 @@ const twoFactorController = async (
       },
       data: {
         isTwoFactorEnabled: !!twoFactor,
-      },
-      select: {
-        isTwoFactorEnabled: true,
       },
     });
 
