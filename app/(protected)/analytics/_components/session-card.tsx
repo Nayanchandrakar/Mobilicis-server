@@ -1,6 +1,8 @@
 "use client";
+
 import { useSocket } from "@/app/provider/socket-provider";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { sessionInterface } from "@/types/types";
 import type { DeviceDetectorResult } from "device-detector-js";
@@ -21,6 +23,7 @@ const SessionCard = ({
   userId,
   ua,
   rawAgent,
+  isRestricted,
 }: SessionCardProps) => {
   const { client, device, os } = userAgent;
 
@@ -36,8 +39,22 @@ const SessionCard = ({
     if (!socket) {
       return;
     }
-
     socket?.emit("sessionLogout", id);
+  };
+
+  const handleRestrictDevice = async () => {
+    if (!socket) {
+      return;
+    }
+
+    if (isCurrentDevice) {
+      return;
+    }
+
+    socket?.emit("restrictDevice", {
+      id,
+      isRestricted: !isRestricted,
+    });
   };
 
   return (
@@ -53,7 +70,7 @@ const SessionCard = ({
           <Badge
             onClick={() => handleSessionLogout()}
             className={cn(
-              "cursor-pointer",
+              "cursor-pointer line-clamp-1",
               isCurrentDevice
                 ? "bg-sky-600 hover:bg-sky-600/90"
                 : "bg-red-600 hover:bg-red-600/90"
@@ -76,6 +93,15 @@ const SessionCard = ({
           {new Date(timeStamp)?.toUTCString()}
         </time>
       </span>
+
+      <Button
+        size="sm"
+        disabled={isCurrentDevice}
+        onClick={handleRestrictDevice}
+        className="w-full bg-sky-600 hover:bg-sky-600/90 rounded-md"
+      >
+        Restrict this device
+      </Button>
     </div>
   );
 };

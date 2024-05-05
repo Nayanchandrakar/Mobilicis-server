@@ -16,6 +16,7 @@ export interface sessionInterface {
   id: string;
   token: string;
   userAgent: string;
+  isRestricted: boolean;
   status: boolean;
   timeStamp: Date;
   userId: string;

@@ -55,10 +55,11 @@ export const getSingleSession = async (token: string) => {
     const userAgentStructure = { headers: headersList };
     const { ua } = userAgent(userAgentStructure);
 
-    const res = await fetch(`${serverUrl(`/session/single/${ua}`)}`, {
+    const res = await fetch(`${serverUrl(`/session/single`)}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
+        "User-Agent": ua,
       },
     });
 

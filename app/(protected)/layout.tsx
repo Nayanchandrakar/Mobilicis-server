@@ -8,6 +8,7 @@ import { UNAUTHORIZED_REDIRECT } from "@/routes";
 import { getToken } from "@/app/action/cookei";
 import { SocketProvider } from "@/app/provider/socket-provider";
 import { getSingleSession } from "../action/session";
+import MobileNavigation from "./_components/mobile-navigation";
 
 export const metadata: Metadata = {
   title: "Protected user Page",
@@ -42,6 +43,7 @@ export default async function UserLayout({
       <div className="h-full relative">
         <div className="hidden p-4 h-full md:flex md:w-72 md:flex-col md:fixed md:inset-y-0  bg-white  border-r">
           <Sidebar />
+          <MobileNavigation />
         </div>
         <Navbar user={user} />
         <main className="md:pl-72 pl-0 mt-[78px]">{children}</main>

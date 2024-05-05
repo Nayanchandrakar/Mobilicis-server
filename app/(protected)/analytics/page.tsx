@@ -25,7 +25,7 @@ const AnalyticsPage = async ({}: AnalyticsPageProps) => {
   return (
     <Container>
       <>
-        <div className="py-20 flex items-center justify-center flex-col">
+        <div className="md:py-10 flex items-center justify-center flex-col">
           <ShieldCheck className="size-24 text-sky-600" />
           <h2 className="font-semibold text-xl sm:text-3xl">
             Manage Access and Devices
@@ -38,7 +38,7 @@ const AnalyticsPage = async ({}: AnalyticsPageProps) => {
             <br /> security.
           </p>
         </div>
-        <section className="grid grid-cols-3 gap-4">
+        <section className="grid grid-cols-1 lg:grid-cols-2 min-[1350px]:grid-cols-3 gap-6 mt-12 md:mt-0 mb-12 ">
           {formattedData?.map((data) => (
             <SessionCard key={data?.id} {...data} ua={ua} />
           ))}

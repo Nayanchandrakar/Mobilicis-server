@@ -2,6 +2,7 @@
 
 import { serverUrl } from "@/lib/env-export";
 import { twoFactorSchema, twoFactorSchemaType } from "@/schema/zod-schema";
+import { revalidateTag } from "next/cache";
 
 export const twoFactorAction = async (
   formData: twoFactorSchemaType,
@@ -24,6 +25,8 @@ export const twoFactorAction = async (
       },
       body: JSON.stringify(formData),
     });
+
+    revalidateTag("twoFactor");
 
     const resData = await res.json();
 

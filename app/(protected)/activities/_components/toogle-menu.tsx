@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import {
   Form,
@@ -20,7 +19,6 @@ import { twoFactorSchema, twoFactorSchemaType } from "@/schema/zod-schema";
 import { useTransition } from "react";
 import { twoFactorAction } from "@/app/action/twofactor";
 import { ToastEmitter } from "@/lib/toast-emitter";
-import { useRouter } from "next/navigation";
 
 interface ToogleMenuProps {
   user: userInterface;
@@ -30,7 +28,6 @@ interface ToogleMenuProps {
 const ToogleMenu = ({ user, token }: ToogleMenuProps) => {
   const { socket } = useSocket();
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
 
   const handleSocket = () => {
     if (!socket) {
@@ -50,11 +47,8 @@ const ToogleMenu = ({ user, token }: ToogleMenuProps) => {
     startTransition(async () => {
       const res = await twoFactorAction(data, token);
       ToastEmitter(res);
-      router?.refresh();
     });
   }
-
-  console.log(user);
 
   return (
     <Form {...form}>

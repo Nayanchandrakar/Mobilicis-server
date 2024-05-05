@@ -68,6 +68,15 @@ export const SocketProvider = ({
       });
     }
 
+    if (session && session?.id) {
+      socketInstance?.on(`${session?.id}34545`, async (isValid) => {
+        if (isValid) {
+          await logoutAction();
+          toast.error("Device restricted");
+        }
+      });
+    }
+
     setSocket(socketInstance as Socket);
 
     return () => {

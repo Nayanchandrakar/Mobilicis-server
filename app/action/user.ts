@@ -8,6 +8,9 @@ export const getUser = async (token: string): Promise<userInterface | null> => {
         Authorization: `Bearer ${token}`,
       },
       cache: "force-cache",
+      next: {
+        tags: ["twoFactor"],
+      },
     });
 
     if (!res.ok) {
