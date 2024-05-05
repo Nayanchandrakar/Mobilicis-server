@@ -5,9 +5,9 @@ export interface userInterface {
   name: string;
   email: string;
   password: string;
-  jwtToken: string;
   emailVerified: Date;
   role: UserRoleType;
+  isTwoFactorEnabled: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

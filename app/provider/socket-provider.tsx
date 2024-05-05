@@ -1,6 +1,6 @@
 "use client";
 
-import { userInterface } from "@/types/types";
+import { sessionInterface, userInterface } from "@/types/types";
 import { useContext, useState, useEffect, createContext } from "react";
 import { io } from "socket.io-client";
 import type { Socket } from "socket.io-client";
@@ -24,9 +24,11 @@ export const useSocket = () => {
 export const SocketProvider = ({
   children,
   user,
+  session,
 }: {
   children: React.ReactNode;
   user: userInterface;
+  session: sessionInterface;
 }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -53,6 +55,15 @@ export const SocketProvider = ({
         if (isValid) {
           await logoutAction();
           toast.error("Session expired");
+        }
+      });
+    }
+
+    if (session && session?.id) {
+      socketInstance?.on(session?.id, async (isValid) => {
+        if (isValid) {
+          await logoutAction();
+          toast.error("Session logout");
         }
       });
     }

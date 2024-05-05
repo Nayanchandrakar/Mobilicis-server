@@ -10,4 +10,6 @@ const expires = new Date(new Date().getTime() + 7 * oneDay);
 
 export const cookieConfig = {
   expires,
+  secure: true,
+  httpOnly: true,
 };

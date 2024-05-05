@@ -1,4 +1,5 @@
 "use client";
+import { useSocket } from "@/app/provider/socket-provider";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { sessionInterface } from "@/types/types";
@@ -25,6 +26,20 @@ const SessionCard = ({
 
   const isCurrentDevice = !!(ua === rawAgent);
 
+  const { socket } = useSocket();
+
+  const handleSessionLogout = async () => {
+    if (isCurrentDevice) {
+      return;
+    }
+
+    if (!socket) {
+      return;
+    }
+
+    socket?.emit("sessionLogout", id);
+  };
+
   return (
     <div className="bg-sky-100/50 rounded-md p-3 space-y-4 border">
       <span className="flex items-center justify-between gap-3">
@@ -36,7 +51,9 @@ const SessionCard = ({
         </span>
         {
           <Badge
+            onClick={() => handleSessionLogout()}
             className={cn(
+              "cursor-pointer",
               isCurrentDevice
                 ? "bg-sky-600 hover:bg-sky-600/90"
                 : "bg-red-600 hover:bg-red-600/90"

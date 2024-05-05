@@ -7,6 +7,7 @@ import { getUser } from "@/app/action/user";
 import { UNAUTHORIZED_REDIRECT } from "@/routes";
 import { getToken } from "@/app/action/cookei";
 import { SocketProvider } from "@/app/provider/socket-provider";
+import { getSingleSession } from "../action/session";
 
 export const metadata: Metadata = {
   title: "Protected user Page",
@@ -30,8 +31,14 @@ export default async function UserLayout({
     return redirect(UNAUTHORIZED_REDIRECT);
   }
 
+  const userSession = await getSingleSession(token);
+
+  if (!userSession) {
+    return redirect(UNAUTHORIZED_REDIRECT);
+  }
+
   return (
-    <SocketProvider user={user}>
+    <SocketProvider user={user} session={userSession?.data!}>
       <div className="h-full relative">
         <div className="hidden p-4 h-full md:flex md:w-72 md:flex-col md:fixed md:inset-y-0  bg-white  border-r">
           <Sidebar />

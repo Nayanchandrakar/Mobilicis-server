@@ -36,7 +36,7 @@ const ActivityPage = async ({}: ActivityPageProps) => {
 
   return (
     <Container>
-      <ToogleMenu user={user!} />
+      <ToogleMenu token={token} user={user!} />
       <DataTable columns={columns} data={finalData} />
     </Container>
   );

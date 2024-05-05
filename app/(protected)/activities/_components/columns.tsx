@@ -74,7 +74,7 @@ export const columns: ColumnDef<activityType>[] = [
     },
     cell: ({ row }) => {
       const time = row.getValue("time") as string;
-      return <Badge>{time}</Badge>;
+      return <Badge className="w-fit line-clamp-1">{time}</Badge>;
     },
   },
   {
