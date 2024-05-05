@@ -15,7 +15,6 @@ import {
 
 import { ActivitType } from "@/types/user-role";
 import { deleteActivityAction } from "@/app/action/delete-activity";
-import { useTransition } from "react";
 
 export type activityType = {
   id: string;
@@ -90,15 +89,12 @@ export const columns: ColumnDef<activityType>[] = [
     id: "actions",
     cell: ({ row }) => {
       const { id } = row?.original;
-      const [isPending, startTransition] = useTransition();
 
-      const handleDelete = () => {
+      const handleDelete = async () => {
         if (!id) {
           return;
         }
-        startTransition(async () => {
-          await deleteActivityAction(id);
-        });
+        await deleteActivityAction(id);
       };
 
       return (
@@ -112,7 +108,6 @@ export const columns: ColumnDef<activityType>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuItem
               onClick={handleDelete}
-              disabled={isPending}
               className="text-red-500 cursor-pointer"
             >
               <Trash className="w-4 h-4 mr-2" />

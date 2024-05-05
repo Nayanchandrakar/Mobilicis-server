@@ -26,9 +26,7 @@ export const TokenVerification = ({ token }: { token: string }) => {
       title=" verify your email. ✅"
       description="email verification page"
       backButtonLabel="go to website"
-      backButtonHref={serverUrl(
-        !success ? UNAUTHORIZED_REDIRECT : DEFAULT_REDIRECT_URL
-      )}
+      backButtonHref={!success ? UNAUTHORIZED_REDIRECT : DEFAULT_REDIRECT_URL}
     >
       <div
         className={cn(
