@@ -314,10 +314,48 @@ const twoFactorController = async (
   }
 };
 
+const logoutController = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user;
+
+    const user = await getUserById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        error: "Invalid token provided",
+      });
+    }
+
+    const userAgent = req?.headers["user-agent"];
+
+    if (!userAgent) {
+      return res.status(402).json({
+        error: "No user Agent found",
+      });
+    }
+
+    await createAuditLog({
+      type: "LOGOUT",
+      userAgent,
+      userId: user?.id,
+    });
+
+    return res.status(200).json({
+      success: "user logout Tracked",
+      data: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+};
+
 export {
   registerController,
   verifyTokenController,
   loginController,
   userController,
   twoFactorController,
+  logoutController,
 };

@@ -6,6 +6,7 @@ import {
   loginController,
   userController,
   twoFactorController,
+  logoutController,
 } from "../controllers/auth-controller";
 import {
   loginSchema,
@@ -27,4 +28,5 @@ router.post(
   twoFactorController
 );
 
+router.get("/logout", authenticateToken, logoutController);
 export default router;
