@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 import { sessionInterface } from "@/types/types";
 import type { DeviceDetectorResult } from "device-detector-js";
 import { Clock, Computer, User } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface SessionCardProps extends Omit<sessionInterface, "userAgent"> {
   userAgent: DeviceDetectorResult;
@@ -26,36 +28,57 @@ const SessionCard = ({
   const { client, device, os } = userAgent;
 
   const isCurrentDevice = !!(ua === rawAgent);
+  const [isRestrictedLoading, setIsRestricted] = useState(false);
+  const [isLogoutLoading, setIsLogoutLoading] = useState(false);
 
   const { socket } = useSocket();
 
   const handleSessionLogout = async () => {
-    if (isCurrentDevice) {
-      return;
-    }
+    try {
+      if (isCurrentDevice) {
+        return;
+      }
 
-    if (!socket) {
-      return;
+      if (!socket) {
+        return;
+      }
+
+      if (isLogoutLoading) {
+        return;
+      }
+
+      setIsLogoutLoading(true);
+      socket?.emit("sessionLogout", id);
+      await refetchSession("refetchSession");
+    } catch (error) {
+      toast.error("Internal server error");
+    } finally {
+      setIsLogoutLoading(false);
     }
-    socket?.emit("sessionLogout", id);
-    await refetchSession("refetchSession");
   };
 
   const handleRestrictDevice = async () => {
-    if (!socket) {
-      return;
+    try {
+      if (!socket) {
+        return;
+      }
+
+      if (isCurrentDevice) {
+        return;
+      }
+
+      setIsRestricted(true);
+      socket?.emit("restrictDevice", {
+        id,
+        isRestricted: !isRestricted,
+      });
+
+      await refetchSession("refetchSession");
+    } catch (error) {
+      toast.error("Internal server Error");
+    } finally {
+      setIsRestricted(false);
     }
-
-    if (isCurrentDevice) {
-      return;
-    }
-
-    socket?.emit("restrictDevice", {
-      id,
-      isRestricted: !isRestricted,
-    });
-
-    await refetchSession("refetchSession");
   };
 
   return (
@@ -67,11 +90,12 @@ const SessionCard = ({
             {device?.type} {client?.name} - {client?.type}
           </p>
         </span>
-        {
+        {!isRestricted && (
           <Badge
             onClick={() => handleSessionLogout()}
             className={cn(
               "cursor-pointer line-clamp-1",
+              isLogoutLoading && "opacity-90",
               isCurrentDevice
                 ? "bg-sky-600 hover:bg-sky-600/90"
                 : "bg-red-600 hover:bg-red-600/90"
@@ -79,7 +103,7 @@ const SessionCard = ({
           >
             {isCurrentDevice ? "current device" : "log out"}
           </Badge>
-        }
+        )}
       </span>
 
       <hr className="border-zinc-300" />
@@ -97,11 +121,11 @@ const SessionCard = ({
 
       <Button
         size="sm"
-        disabled={isCurrentDevice}
+        disabled={isCurrentDevice || isRestrictedLoading}
         onClick={handleRestrictDevice}
         className="w-full bg-sky-600 hover:bg-sky-600/90 rounded-md"
       >
-        Restrict this device
+        {isRestricted ? "Unrestrict device" : " Restrict this device"}
       </Button>
     </div>
   );
