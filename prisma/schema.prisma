@@ -16,6 +16,7 @@ enum AuditType {
   REGISTER
   LOGIN
   LOGOUT
+  RESTRICTED
 }
 
 model User {

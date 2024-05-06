@@ -57,6 +57,10 @@ app.use("/activity", activityRoute);
 
 app.use("/session", sessionRoute);
 
+app.use("/", (req, res) => {
+  return res.status(200).json("HELLO WORLD");
+});
+
 // socket io
 io.on("connect", (socket) => {
   console.log(socket?.id, "a user connnected");
@@ -70,9 +74,10 @@ io.on("connect", (socket) => {
 
   socket?.on("sessionLogout", async (sessionId: string) => {
     const sessionData = await deleteSingleSession(sessionId);
+
     if (sessionData?.id) {
       await createAuditLog({
-        type: "LOGIN",
+        type: "LOGOUT",
         userAgent: sessionData?.userAgent,
         userId: sessionData?.userId,
       });
@@ -96,6 +101,12 @@ io.on("connect", (socket) => {
           },
         });
 
+        await createAuditLog({
+          type: "RESTRICTED",
+          userAgent: session?.userAgent,
+          userId: session?.userId,
+        });
+
         io?.emit(`${session?.id}34545`, !!session);
       }
     }
@@ -106,6 +117,7 @@ io.on("connect", (socket) => {
   });
 });
 
+// @ts-ignore
 server.listen(PORT, () => {
   console.log(`server is running on http://localhost:${PORT}`);
 });
