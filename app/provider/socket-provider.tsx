@@ -34,9 +34,12 @@ export const SocketProvider = ({
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    const socketInstance = io("http://localhost:5000", {
-      transports: ["websocket", "polling"],
-    });
+    const socketInstance = io(
+      "https://enthusiastic-courtesy-production.up.railway.app",
+      {
+        transports: ["websocket", "polling"],
+      }
+    );
 
     socketInstance.on("connect", () => {
       setIsConnected(true);
