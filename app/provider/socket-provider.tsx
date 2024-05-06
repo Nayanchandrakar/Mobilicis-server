@@ -6,6 +6,7 @@ import { io } from "socket.io-client";
 import type { Socket } from "socket.io-client";
 import { toast } from "sonner";
 import { logoutAction } from "@/app/action/logout";
+import { serverUrl } from "@/lib/env-export";
 
 type SocketContextType = {
   isConnected: boolean;
@@ -34,12 +35,9 @@ export const SocketProvider = ({
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    const socketInstance = io(
-      "https://enthusiastic-courtesy-production.up.railway.app",
-      {
-        transports: ["websocket", "polling"],
-      }
-    );
+    const socketInstance = io(serverUrl(), {
+      transports: ["websocket", "polling"],
+    });
 
     socketInstance.on("connect", () => {
       setIsConnected(true);
