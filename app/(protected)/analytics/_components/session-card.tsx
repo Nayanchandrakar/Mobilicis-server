@@ -1,5 +1,6 @@
 "use client";
 
+import { refetchSession } from "@/app/action";
 import { useSocket } from "@/app/provider/socket-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,11 +17,8 @@ interface SessionCardProps extends Omit<sessionInterface, "userAgent"> {
 
 const SessionCard = ({
   id,
-  status,
   timeStamp,
-  token,
   userAgent,
-  userId,
   ua,
   rawAgent,
   isRestricted,
@@ -40,6 +38,7 @@ const SessionCard = ({
       return;
     }
     socket?.emit("sessionLogout", id);
+    await refetchSession("refetchSession");
   };
 
   const handleRestrictDevice = async () => {
@@ -55,6 +54,8 @@ const SessionCard = ({
       id,
       isRestricted: !isRestricted,
     });
+
+    await refetchSession("refetchSession");
   };
 
   return (

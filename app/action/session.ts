@@ -19,6 +19,9 @@ export const getUserSession = async () => {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      next: {
+        tags: ["refetchSession"],
+      },
     });
 
     const resData = await res.json();
